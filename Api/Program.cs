@@ -80,7 +80,26 @@ builder.Services.AddSwaggerGen(configuration =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// seed data
+using (var scope = app.Services.CreateScope())
+{
+  var services = scope.ServiceProvider;
+  var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+  try
+  {
+    var context = services.GetRequiredService<AppDbContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await SeedDb.CreateRolesSeed(roleManager);
+  }
+  catch (Exception ex)
+  {
+    var logger = loggerFactory.CreateLogger<Program>();
+    logger.LogError(ex, "An error occurred seeding the DB.");
+  }
+}
+
 if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
