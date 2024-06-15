@@ -20,6 +20,6 @@ namespace Api.Dtos
     [Required]
     public required string Password { get; set; }
 
-    public List<string>? Roles { get; set; }
+    public string[]? Roles { get; set; }
   }
 }
