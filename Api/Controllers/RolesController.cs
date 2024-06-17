@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers
 {
   [ApiController]
-  [Authorize(Roles = "ADMIN, MANAGER")]
+  [Authorize(Roles = RoleConstants.ADMIN)]
   [Route("api/[controller]")]
   public class RolesController : Controller
   {
@@ -65,5 +65,42 @@ namespace Api.Controllers
 
       return Ok(new ResponseDto { IsSuccess = true, Message = "Rol eliminado exitosamente" });
     }
+
+    [HttpPost("assign")]
+    public async Task<IActionResult> AssignRole(RoleAssignDto roleAssignDto)
+    {
+      var user = await _userManager.FindByIdAsync(roleAssignDto.UserId);
+
+      if (user == null) return NotFound(new ResponseDto { IsSuccess = false, Message = "Usuario no encontrado" });
+
+      var role = await _roleManager.FindByIdAsync(roleAssignDto.RoleId);
+
+      if (role == null) return NotFound(new ResponseDto { IsSuccess = false, Message = "Rol no encontrado" });
+
+      var result = await _userManager.AddToRoleAsync(user, role.Name!);
+
+      if (!result.Succeeded) return BadRequest(new ResponseDto { IsSuccess = false, Message = "Error al asignar el rol" });
+
+      return Ok(new ResponseDto { IsSuccess = true, Message = "Rol asignado exitosamente" });
+    }
+
+    [HttpPost("removeRole")]
+    public async Task<IActionResult> RemoveRole(RoleAssignDto roleAssignDto)
+    {
+      var user = await _userManager.FindByIdAsync(roleAssignDto.UserId);
+
+      if (user == null) return NotFound(new ResponseDto { IsSuccess = false, Message = "Usuario no encontrado" });
+
+      var role = await _roleManager.FindByIdAsync(roleAssignDto.RoleId);
+
+      if (role == null) return NotFound(new ResponseDto { IsSuccess = false, Message = "Rol no encontrado" });
+
+      var result = await _userManager.RemoveFromRoleAsync(user, role.Name!);
+
+      if (!result.Succeeded) return BadRequest(new ResponseDto { IsSuccess = false, Message = "Error al remover el rol" });
+
+      return Ok(new ResponseDto { IsSuccess = true, Message = "Rol removido exitosamente" });
+    }
+
   }
 }

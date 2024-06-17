@@ -51,7 +51,7 @@ namespace Api.Controllers
 
       if (registerDto.Roles == null)
       {
-        await _userManager.AddToRoleAsync(user, Roles.BASIC.ToString());
+        await _userManager.AddToRoleAsync(user, RoleConstants.BASIC);
       }
       else
       {
