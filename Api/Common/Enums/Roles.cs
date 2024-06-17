@@ -1,9 +1,9 @@
 ﻿namespace Api.Common.Enums
 {
-  public enum Roles
+  public static class RoleConstants
   {
-    ADMIN,
-    MANAGER,
-    BASIC,
+    public const string ADMIN = "ADMIN";
+    public const string MANAGER = "MANAGER";
+    public const string BASIC = "BASIC";
   }
 }
