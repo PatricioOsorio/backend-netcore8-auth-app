@@ -10,7 +10,7 @@
     public string[]? Roles { get; set; }
     public string? PhoneNumber { get; set; }
     public bool? IsDoubleFactoEnabled { get; set; }
-    public bool? IsPhoneNumberConfirmed{ get; set; }
+    public bool? IsPhoneNumberConfirmed { get; set; }
     public int? AccessFailedCount { get; set; }
   }
 }

@@ -15,6 +15,7 @@ namespace Api.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [Authorize]
   public class AccountController : ControllerBase
   {
     private readonly UserManager<AppUser> _userManager;
@@ -30,6 +31,7 @@ namespace Api.Controllers
 
     // api/account/register
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterDto registerDto)
     {
       if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -68,6 +70,7 @@ namespace Api.Controllers
 
     // api/account/login
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginDto loginDto)
     {
       if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -155,7 +158,7 @@ namespace Api.Controllers
     }
 
     // api/account/getUsers
-    [HttpGet()]
+    [HttpGet("getUsers")]
     public async Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers()
     {
       var users = await _userManager.Users.Select(u => new UserDetailDto
