@@ -12,8 +12,9 @@ namespace Api.Data
       // Crear roles si no existen
       if (roleManager.Roles.Any()) return;
 
-      await roleManager.CreateAsync(new IdentityRole(Roles.ADMIN.ToString()));
-      await roleManager.CreateAsync(new IdentityRole(Roles.BASIC.ToString()));
+      await roleManager.CreateAsync(new IdentityRole(RoleConstants.ADMIN));
+      await roleManager.CreateAsync(new IdentityRole(RoleConstants.MANAGER));
+      await roleManager.CreateAsync(new IdentityRole(RoleConstants.BASIC));
     }
 
   }
