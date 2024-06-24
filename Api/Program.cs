@@ -52,7 +52,7 @@ builder.Services.AddSwaggerGen(configuration =>
 {
   configuration.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
   {
-    Description = @"JWT authorization example: Jeah!",
+    Description = @"JWT authorization example: Yeah!",
     Name = "Authorization",
     In = ParameterLocation.Header,
     Type = SecuritySchemeType.ApiKey,
@@ -107,6 +107,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseAuthentication();
 
