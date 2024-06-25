@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers
 {
   [ApiController]
-  [Authorize(Roles = RoleConstants.ADMIN)]
+  [Authorize(Roles = $"{RoleConstants.ADMIN}")]
   [Route("api/[controller]")]
   public class RolesController : Controller
   {
@@ -39,17 +39,24 @@ namespace Api.Controllers
     }
 
     [HttpGet("getRoles")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<RoleResponseDto>>> GetRoles()
     {
-      // lista de roles con la cantidad de usuarios asignados
-      var roles = await _roleManager.Roles.Select(r => new RoleResponseDto
-      {
-        Id = r.Id,
-        Name = r.Name,
-        TotalUsers = _userManager.GetUsersInRoleAsync(r.Name!).Result.Count
-      }).ToListAsync();
+      var roles = await _roleManager.Roles.ToListAsync();
+      var rolesWithUserCounts = new List<RoleResponseDto>();
 
-      return Ok(roles);
+      foreach (var role in roles)
+      {
+        var usersInRole = await _userManager.GetUsersInRoleAsync(role.Name!);
+        rolesWithUserCounts.Add(new RoleResponseDto
+        {
+          Id = role.Id,
+          Name = role.Name,
+          TotalUsers = usersInRole.Count
+        });
+      }
+
+      return Ok(rolesWithUserCounts);
     }
 
     [HttpDelete("delete/{id}")]
