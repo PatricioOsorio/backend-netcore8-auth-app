@@ -77,7 +77,7 @@ namespace Api.Controllers
 
       var user = await _userManager.FindByEmailAsync(loginDto.Correo);
 
-      if (user == null) return Unauthorized(new AuthRespondeDto { IsSuccess = false, Message = "Usuario no encontrado" });
+      if (user == null) return Unauthorized(new AuthRespondeDto { IsSuccess = false, Message = "Correo no encontrado" });
 
       var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
