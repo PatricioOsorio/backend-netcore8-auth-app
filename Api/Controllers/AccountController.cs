@@ -161,17 +161,27 @@ namespace Api.Controllers
     [HttpGet("getUsers")]
     public async Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers()
     {
-      var users = await _userManager.Users.Select(u => new UserDetailDto
-      {
-        Id = u.Id,
-        Nombre = u.Nombres,
-        ApellidoPaterno = u.ApellidoPaterno,
-        ApellidoMaterno = u.ApellidoMaterno,
-        Correo = u.Email,
-        Roles = _userManager.GetRolesAsync(u).Result.ToArray(),
-      }).ToListAsync();
+      await Task.Delay(1000);
 
-      return Ok(users);
+      var users = await _userManager.Users.ToListAsync();
+      var userDetailDtos = new List<UserDetailDto>();
+
+      foreach (var user in users)
+      {
+        var roles = await _userManager.GetRolesAsync(user);
+        userDetailDtos.Add(new UserDetailDto
+        {
+          Id = user.Id,
+          Nombre = user.Nombres,
+          ApellidoPaterno = user.ApellidoPaterno,
+          ApellidoMaterno = user.ApellidoMaterno,
+          Correo = user.Email,
+          Roles = [.. roles]
+        });
+      }
+
+      return Ok(userDetailDtos);
     }
+
   }
 }
