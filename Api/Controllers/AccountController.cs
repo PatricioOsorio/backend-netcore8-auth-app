@@ -161,8 +161,6 @@ namespace Api.Controllers
     [HttpGet("getUsers")]
     public async Task<ActionResult<IEnumerable<UserDetailDto>>> GetUsers()
     {
-      await Task.Delay(1000);
-
       var users = await _userManager.Users.ToListAsync();
       var userDetailDtos = new List<UserDetailDto>();
 

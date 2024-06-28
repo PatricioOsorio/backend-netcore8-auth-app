@@ -66,6 +66,11 @@ namespace Api.Controllers
 
       if (role == null) return NotFound(new ResponseDto { IsSuccess = false, Message = "Rol no encontrado" });
 
+      // si el rol tiene asignados usuarios no se puede eliminar
+      var usersInRole = await _userManager.GetUsersInRoleAsync(role.Name!);
+
+      if (usersInRole.Count > 0) return BadRequest(new ResponseDto { IsSuccess = false, Message = "El rol tiene usuarios asignados, no se puede eliminar" });
+
       var roleResult = await _roleManager.DeleteAsync(role);
 
       if (!roleResult.Succeeded) return BadRequest(new ResponseDto { IsSuccess = false, Message = "Error al eliminar el rol" });
@@ -83,6 +88,10 @@ namespace Api.Controllers
       var role = await _roleManager.FindByIdAsync(roleAssignDto.RoleId);
 
       if (role == null) return NotFound(new ResponseDto { IsSuccess = false, Message = "Rol no encontrado" });
+
+      var userRoles = await _userManager.GetRolesAsync(user);
+
+      if (userRoles.Contains(role.Name!)) return BadRequest(new ResponseDto { IsSuccess = false, Message = "El usuario ya tiene el rol asignado" });
 
       var result = await _userManager.AddToRoleAsync(user, role.Name!);
 
