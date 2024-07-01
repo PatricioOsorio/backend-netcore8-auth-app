@@ -3,10 +3,10 @@
   public class UserDetailDto
   {
     public string? Id { get; set; }
-    public string? Nombre { get; set; }
-    public string? ApellidoPaterno { get; set; }
-    public string? ApellidoMaterno { get; set; }
-    public string? Correo { get; set; }
+    public string? Name { get; set; }
+    public string? PaternalLastName { get; set; }
+    public string? MothersLastName { get; set; }
+    public string? Email { get; set; }
     public string[]? Roles { get; set; }
     public string? PhoneNumber { get; set; }
     public bool? IsDoubleFactoEnabled { get; set; }

@@ -38,11 +38,11 @@ namespace Api.Controllers
 
       var user = new AppUser
       {
-        UserName = $"{registerDto.Nombres}-app-auth",
-        Email = registerDto.Correo,
-        Nombres = registerDto.Nombres,
-        ApellidoPaterno = registerDto.ApellidoPaterno,
-        ApellidoMaterno = registerDto.ApellidoMaterno,
+        UserName = $"{registerDto.Names}-app-auth",
+        Email = registerDto.Email,
+        Names = registerDto.Names,
+        PaternalLastName = registerDto.PaternalLastName,
+        MothersLastName = registerDto.MothersLastName,
       };
 
       var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -75,11 +75,18 @@ namespace Api.Controllers
     {
       if (!ModelState.IsValid) return BadRequest(ModelState);
 
-      var user = await _userManager.FindByEmailAsync(loginDto.Correo);
+      var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
       if (user == null) return Unauthorized(new AuthRespondeDto { IsSuccess = false, Message = "Correo no encontrado" });
 
       var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+
+      // sumer un intento de intento a usuario usando identity
+
+      if(!result)
+      {
+        await _userManager.AccessFailedAsync(user);
+      }
 
       if (!result) return Unauthorized(new AuthRespondeDto { IsSuccess = false, Message = "Contraseña inválida" });
 
@@ -97,17 +104,17 @@ namespace Api.Controllers
     private async Task<string> GenerateJwtTokenAsync(AppUser user)
     {
       var tokenHandler = new JwtSecurityTokenHandler();
-      var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
+      var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]!);
 
       var roles = await _userManager.GetRolesAsync(user);
 
       var claims = new List<Claim>
       {
-        new (JwtRegisteredClaimNames.Email , user.Email),
-        new (JwtRegisteredClaimNames.Name , user.Nombres),
+        new (JwtRegisteredClaimNames.Email , user.Email!),
+        new (JwtRegisteredClaimNames.Name , user.Names),
         new (JwtRegisteredClaimNames.NameId , user.Id),
-        new (JwtRegisteredClaimNames.Aud , _configuration["JwtSettings:ValidAudience"]),
-        new (JwtRegisteredClaimNames.Iss , _configuration["JwtSettings:ValidIssuer"]),
+        new (JwtRegisteredClaimNames.Aud , _configuration["JwtSettings:ValidAudience"]!),
+        new (JwtRegisteredClaimNames.Iss , _configuration["JwtSettings:ValidIssuer"]!),
       };
 
 
@@ -134,6 +141,13 @@ namespace Api.Controllers
     public async Task<IActionResult> Detail()
     {
       var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+      if (currentUserId == null) return NotFound(new AuthRespondeDto
+      {
+        IsSuccess = false,
+        Message = "Usuario no encontrado"
+      });
+
       var user = await _userManager.FindByIdAsync(currentUserId);
 
       if (user == null) return NotFound(new AuthRespondeDto
@@ -145,10 +159,10 @@ namespace Api.Controllers
       return Ok(new UserDetailDto
       {
         Id = user.Id,
-        Nombre = user.Nombres,
-        ApellidoPaterno = user.ApellidoPaterno,
-        ApellidoMaterno = user.ApellidoMaterno,
-        Correo = user.Email,
+        Name = user.Names,
+        PaternalLastName = user.PaternalLastName,
+        MothersLastName = user.MothersLastName,
+        Email = user.Email,
         Roles = [.. await _userManager.GetRolesAsync(user)],
         PhoneNumber = user.PhoneNumber,
         IsDoubleFactoEnabled = user.TwoFactorEnabled,
@@ -170,10 +184,10 @@ namespace Api.Controllers
         userDetailDtos.Add(new UserDetailDto
         {
           Id = user.Id,
-          Nombre = user.Nombres,
-          ApellidoPaterno = user.ApellidoPaterno,
-          ApellidoMaterno = user.ApellidoMaterno,
-          Correo = user.Email,
+          Name = user.Names,
+          PaternalLastName = user.PaternalLastName,
+          MothersLastName = user.MothersLastName,
+          Email = user.Email,
           Roles = [.. roles]
         });
       }
@@ -181,5 +195,19 @@ namespace Api.Controllers
       return Ok(userDetailDtos);
     }
 
+    // api/account/forgotPassword
+
+    // public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+    // {
+    //   var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+
+    //   if (user is null) return Ok(new AuthRespondeDto
+    //   {
+    //     IsSuccess = false,
+    //     Message = "El usuario no existe con este email"
+    //   });
+
+
+    // }
   }
 }

@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(options =>
     ValidateAudience = true, // ensure that the recipient of the token is authorized to receive it
     ValidAudience = builder.Configuration["JwtSettings:ValidAudience"], // audience is the client that this token is intended for
     ValidIssuer = builder.Configuration["JwtSettings:ValidIssuer"], // the server that created the token
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"])) // The signing key
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)) // The signing key
   };
 });
 
@@ -92,6 +92,7 @@ using (var scope = app.Services.CreateScope())
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
     await SeedDb.CreateRolesSeed(roleManager);
+    await SeedDb.CreateUserAdminBasicSeed(userManager);
   }
   catch (Exception ex)
   {

@@ -4,8 +4,8 @@ namespace Api.Models
 {
   public class AppUser : IdentityUser
   {
-        public string Nombres { get; set; }
-        public string ApellidoPaterno { get; set; }
-        public string ApellidoMaterno { get; set; }
+        public string Names { get; set; }
+        public string PaternalLastName { get; set; }
+        public string MothersLastName { get; set; }
     }
 }

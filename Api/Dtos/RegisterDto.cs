@@ -6,16 +6,16 @@ namespace Api.Dtos
   {
     [Required]
     [EmailAddress]
-    public required string Correo { get; set; }
+    public required string Email { get; set; }
 
     [Required]
-    public required string Nombres { get; set; }
+    public required string Names { get; set; }
 
     [Required]
-    public required string ApellidoPaterno { get; set; }
+    public required string PaternalLastName { get; set; }
 
     [Required]
-    public required string ApellidoMaterno { get; set; }
+    public required string MothersLastName { get; set; }
 
     [Required]
     public required string Password { get; set; }
