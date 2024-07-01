@@ -5,7 +5,7 @@
 namespace Api.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateColNames : Migration
+    public partial class UpdateColumnNames : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

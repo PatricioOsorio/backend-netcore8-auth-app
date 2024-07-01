@@ -159,7 +159,7 @@ namespace Api.Controllers
       return Ok(new UserDetailDto
       {
         Id = user.Id,
-        Name = user.Names,
+        Names = user.Names,
         PaternalLastName = user.PaternalLastName,
         MothersLastName = user.MothersLastName,
         Email = user.Email,
@@ -184,7 +184,7 @@ namespace Api.Controllers
         userDetailDtos.Add(new UserDetailDto
         {
           Id = user.Id,
-          Name = user.Names,
+          Names = user.Names,
           PaternalLastName = user.PaternalLastName,
           MothersLastName = user.MothersLastName,
           Email = user.Email,

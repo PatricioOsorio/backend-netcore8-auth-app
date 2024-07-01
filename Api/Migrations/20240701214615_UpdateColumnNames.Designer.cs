@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240701185511_UpdateColNames")]
-    partial class UpdateColNames
+    [Migration("20240701214615_UpdateColumnNames")]
+    partial class UpdateColumnNames
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
