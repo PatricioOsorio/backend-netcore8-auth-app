@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RestSharp;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -83,7 +85,7 @@ namespace Api.Controllers
 
       // sumer un intento de intento a usuario usando identity
 
-      if(!result)
+      if (!result)
       {
         await _userManager.AccessFailedAsync(user);
       }
@@ -196,18 +198,57 @@ namespace Api.Controllers
     }
 
     // api/account/forgotPassword
+    [HttpPost("forgotPassword")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+    {
+      var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
 
-    // public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
-    // {
-    //   var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+      if (user is null) return Ok(new AuthRespondeDto
+      {
+        IsSuccess = false,
+        Message = "El usuario no existe con este email"
+      });
 
-    //   if (user is null) return Ok(new AuthRespondeDto
-    //   {
-    //     IsSuccess = false,
-    //     Message = "El usuario no existe con este email"
-    //   });
+      var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
+      var resetLink = $"{_configuration["Client:ClientUrl"]!}/resetPassword?email={user.Email}&token={WebUtility.UrlEncode(token)}";
 
-    // }
+      var client = new RestClient("https://send.api.mailtrap.io/api/send");
+
+      var request = new RestRequest()
+      {
+        Method = Method.Post,
+        RequestFormat = DataFormat.Json,
+      };
+
+      request.AddHeader("Authorization", "Bearer 8a67a0b53cdc9ca3b0ad98918eb90f3e");
+      request.AddJsonBody(new
+      {
+        from = new { email = "mailtrap@demomailtrap.com", },
+        to = new[] { new { email = user.Email } },
+        template_uuid = "0af3d8b1-c997-4640-900c-be1b5c80bf21",
+        template_variables = new
+        {
+          user_email = user.Email,
+          pass_reset_link = resetLink
+        }
+      });
+
+      var response = await client.ExecuteAsync(request);
+
+      if (!response.IsSuccessful) return BadRequest(new AuthRespondeDto
+      {
+        IsSuccess = false,
+        Message = "Error al enviar el correo"
+        // Message = response.Content!.ToString()
+      });
+
+      return Ok(new AuthRespondeDto
+      {
+        IsSuccess = true,
+        Message = resetLink
+      });
+    }
   }
 }
